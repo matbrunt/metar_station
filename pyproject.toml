@@ -1,0 +1,54 @@
+[tool.poetry]
+name = "metar_station"
+version = "0.0.1"
+description = "Download and process single METAR station data files"
+authors = ["Mat Brunt <matbrunt@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = ">=3.7.1,<4"
+astral = "^2.2"
+metar = "^1.8.0"
+numpy = "^1.20.3"
+pandas = "^1.3.4"
+pendulum = "^2.1.2"
+pandera = {extras = ["hypotheses", "io"], version = "^0.8.0"}
+timezonefinder = {extras = ["numba"], version = "^5.2"}
+great-expectations = "^0.13.44"
+prefect = {extras = ["templates", "viz"], version = "^0.15.10"}
+python-dotenv = "^0.19.2"
+click = "^8.0.3"
+
+[tool.poetry.dev-dependencies]
+poetry2setup = "^1.0.0"
+black = "^21.11b1"
+pytest = "^6.2.5"
+pytest-mock = "^3.6.1"
+ipykernel = "^6.6.0"
+mypy = "^0.910"
+types-requests = "^2.26.1"
+requests-mock = "^1.9.3"
+flake8 = "^4.0.1"
+
+[tool.black]
+line-length = 120
+target-version = ['py37']
+
+[tool.flake8]
+max-line-length = 120
+
+[tool.pytest.ini_options]
+testpaths = "tests"
+markers = [
+    "slow: mark tests as slow (deselect with '-m \"not slow\"')"
+]
+
+[tool.mypy]
+python_version = 3.7
+
+[[tool.mypy.overrides]]
+module = "pyarrow.*"
+ignore_missing_imports = true
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
