@@ -24,14 +24,13 @@ def write_station_raw_csv(filepath: Path, data: bytes) -> None:
         f.write(data)
 
 
-def station_raw_parquet_path(cache_key: str) -> Path:
-    filepath = get_data_dir().joinpath("02-raw_station_pq", f"{cache_key}.parquet")
-    logger.info(f"Generating parquet cache path: {filepath}")
-    return filepath
+def station_raw_parquet_path() -> Path:
+    root_path = get_data_dir().joinpath("02-raw_station_pq")
+    logger.info(f"Generating parquet root path: {root_path}")
+    return root_path
 
 
-def write_station_raw_parquet(filepath: Path, df: DataFrame) -> None:
-    filepath.parent.mkdir(parents=True, exist_ok=True)  #  create datastore if doesn't exist
-    logger.info(f"Saving parquet file: {filepath}")
-    table = pa.Table.from_pandas(df)
-    pq.write_table(table, filepath, flavor="spark")
+def write_station_raw_parquet(root_path: Path, df: DataFrame) -> None:
+    root_path.parent.mkdir(parents=True, exist_ok=True)  #  create datastore if doesn't exist
+    logger.info(f"Saving parquet dataset: {root_path}")
+    df.to_parquet(root_path, engine="pyarrow", index=False, partition_cols=["year", "month"])

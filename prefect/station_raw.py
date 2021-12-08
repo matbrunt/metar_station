@@ -15,6 +15,7 @@ from prefect.engine.signals import SKIP, FAIL
 from metar_station.raw import (
     download,
     io,
+    transform,
     validate_pandera as validator
 )
 
@@ -55,7 +56,11 @@ def process_data(filepath: Path) -> pd.DataFrame:
     logger = prefect.context.logger
 
     logger.info(f"Loading dataset '{filepath}'...")
-    df = pd.read_csv(filepath)
+    df = (
+        pd.read_csv(filepath)
+        .pipe(transform.parse_observation_dt)
+        .pipe(transform.add_partition_cols)
+    )
 
     logger.info(f"Loaded dataset ({df.shape}): {filepath}")
 
@@ -74,12 +79,12 @@ def validate(query: download.StationPeriodQuery, df: pd.DataFrame) -> pd.DataFra
 
 
 @task
-def write_parquet(query: download.StationPeriodQuery, df: pd.DataFrame) -> None:
+def write_parquet(df: pd.DataFrame) -> None:
     logger = prefect.context.logger
 
     logger.info(f"Writing parquet dataset")
-    filepath = io.station_raw_parquet_path(query.cache_key)
-    io.write_station_raw_parquet(filepath, df)
+    root_path = io.station_raw_parquet_path()
+    io.write_station_raw_parquet(root_path, df)
 
 
 def make_flow():
@@ -91,7 +96,7 @@ def make_flow():
         raw_filepath = fetch_station_data(query)
         raw_pdf = process_data(raw_filepath)
         validated_df = validate(query, raw_pdf)
-        write_parquet(query, validated_df)
+        write_parquet(validated_df)
 
     return flow
 
