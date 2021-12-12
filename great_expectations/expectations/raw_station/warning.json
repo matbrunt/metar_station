@@ -1,0 +1,71 @@
+{
+  "data_asset_type": null,
+  "evaluation_parameters": {
+    "stations": [
+      "EGPN"
+    ]
+  },
+  "expectation_suite_name": "raw_station.warning",
+  "expectations": [
+    {
+      "expectation_context": {
+        "description": null
+      },
+      "expectation_type": "expect_table_row_count_to_be_between",
+      "ge_cloud_id": null,
+      "kwargs": {
+        "max_value": 800,
+        "min_value": 700
+      },
+      "meta": {}
+    },
+    {
+      "expectation_context": {
+        "description": null
+      },
+      "expectation_type": "expect_column_values_to_match_strftime_format",
+      "ge_cloud_id": null,
+      "kwargs": {
+        "column": "valid",
+        "strftime_format": "%Y-%m-%d %H:%M"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_context": {
+        "description": null
+      },
+      "expectation_type": "expect_column_distinct_values_to_be_in_set",
+      "ge_cloud_id": null,
+      "kwargs": {
+        "column": "station",
+        "value_set": {
+          "$PARAMETER": "stations"
+        }
+      },
+      "meta": {
+        "substituted_parameters": {
+          "value_set": [
+            "EGPN"
+          ]
+        }
+      }
+    }
+  ],
+  "ge_cloud_id": null,
+  "meta": {
+    "citations": [
+      {
+        "batch_request": {
+          "data_asset_name": "raw_csv",
+          "data_connector_name": "dc_data",
+          "datasource_name": "ds_root",
+          "limit": 1000
+        },
+        "citation_date": "2021-12-08T11:13:19.126916Z",
+        "comment": "Created suite added via CLI"
+      }
+    ],
+    "great_expectations_version": "0.13.44"
+  }
+}
