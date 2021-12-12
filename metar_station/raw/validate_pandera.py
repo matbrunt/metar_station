@@ -2,6 +2,8 @@ import logging
 import pandas as pd
 import pandera as pa
 from pandera import Column, Check, DataFrameSchema
+from pandera.errors import SchemaErrors
+from typing import Optional
 
 
 logger = logging.getLogger(__name__)
@@ -41,12 +43,13 @@ def build_station_raw_schema(station: str) -> DataFrameSchema:
     })
 
 
-def validate_df(df: pd.DataFrame, schema: DataFrameSchema) -> pd.DataFrame:
+def validate_df(df: pd.DataFrame, schema: DataFrameSchema) -> Optional[pd.DataFrame]:
     try:
         validated_df = schema.validate(df, lazy=True)
         logger.info(f"Validation (input shape: {df.shape}) (output shape: {validated_df.shape})")
         return validated_df
-    except pa.errors.SchemaErrors as err:
-        print("Schema errors and failure cases:")
-        print(err.failure_cases)
-        raise
+    except SchemaErrors as err:
+        logger.warning("Schema errors and failure cases:")
+        logger.warning(err.failure_cases)
+
+    return None

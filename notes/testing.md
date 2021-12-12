@@ -20,7 +20,7 @@ https://docs.pytest.org/en/latest/how-to/monkeypatch.html
 
 https://docs.pytest.org/en/latest/how-to/index.html
 
-https://docs.python.org/3/library/unittest.mock.html#unittest.mock.Mock
+[Mock assertions](https://docs.python.org/3/library/unittest.mock.html#unittest.mock.Mock)
 
 https://mypy.readthedocs.io/en/stable/config_file.html#using-a-pyproject-toml-file
 
