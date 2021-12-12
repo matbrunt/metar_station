@@ -10,13 +10,14 @@ from dotenv import load_dotenv
 from pathlib import Path
 from prefect import task, Flow, Parameter
 from prefect.engine.results import LocalResult
-from prefect.engine.signals import SKIP, FAIL
+from prefect.engine import signals
 
 from metar_station.raw import (
     download,
     io,
     transform,
-    validate_pandera as validator
+    validate_ge,
+    validate_pandera
 )
 
 
@@ -52,6 +53,15 @@ def fetch_station_data(query: download.StationPeriodQuery) -> Path:
 
 
 @task()
+def validate_input(query: download.StationPeriodQuery) -> bool:
+    logger = prefect.context.logger
+
+    logger.info(f"Validating raw station download file {query.station} ({query.period_start.strftime('%Y-%m')})...")
+    if not validate_ge.validate(query):
+        raise signals.FAIL(f"Raw station validation failed: {query.station} ({query.period_start.strftime('%Y-%m')})")
+
+
+@task()
 def process_data(filepath: Path) -> pd.DataFrame:
     logger = prefect.context.logger
 
@@ -68,12 +78,15 @@ def process_data(filepath: Path) -> pd.DataFrame:
 
 
 @task(log_stdout=True)
-def validate(query: download.StationPeriodQuery, df: pd.DataFrame) -> pd.DataFrame:
+def validate_output(query: download.StationPeriodQuery, df: pd.DataFrame) -> pd.DataFrame:
     logger = prefect.context.logger
 
-    logger.info(f"Running data validation against {query.station} raw data.")
-    station_raw_schema = validator.build_station_raw_schema(query.station)
-    validated_df = validator.validate_df(df, station_raw_schema)
+    logger.info(f"Running data validation against {query.station} processed data.")
+    station_raw_schema = validate_pandera.build_station_raw_schema(query.station)
+
+    validated_df = validate_pandera.validate_df(df, station_raw_schema)
+    if validated_df is None:
+        raise signals.FAIL(f"Processed station validation failed: {query.station} ({query.period_start.strftime('%Y-%m')})")
 
     return validated_df
 
@@ -94,8 +107,14 @@ def make_flow():
 
         query = build_query(station, period)
         raw_filepath = fetch_station_data(query)
+    
+        raw_data_valid = validate_input(query)
+        raw_data_valid.set_upstream(raw_filepath)
+    
         raw_pdf = process_data(raw_filepath)
-        validated_df = validate(query, raw_pdf)
+        raw_pdf.set_upstream(raw_data_valid)
+
+        validated_df = validate_output(query, raw_pdf)
         write_parquet(validated_df)
 
     return flow
