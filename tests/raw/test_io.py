@@ -53,6 +53,7 @@ def test_write_station_raw_parquet(mocker, tmp_path):
     expected_df = pd.DataFrame(rng.integers(0, 100, size=(100, 4)), columns=list('ABCD'))
     expected_df["year"] = pd.Categorical([2020] * len(expected_df))
     expected_df["month"] = pd.Categorical([1] * len(expected_df))
+    expected_df["station"] = pd.Categorical(["somestation"] * len(expected_df))
 
     io.write_station_raw_parquet(tmp_path, expected_df)
 
