@@ -33,4 +33,4 @@ def station_raw_parquet_path() -> Path:
 def write_station_raw_parquet(root_path: Path, df: DataFrame) -> None:
     root_path.parent.mkdir(parents=True, exist_ok=True)  #  create datastore if doesn't exist
     logger.info(f"Saving parquet dataset: {root_path}")
-    df.to_parquet(root_path, engine="pyarrow", index=False, partition_cols=["year", "month"])
+    df.to_parquet(root_path, engine="pyarrow", index=False, partition_cols=["year", "month", "station"])
