@@ -12,23 +12,16 @@ def test_station_raw_csv_path(mocker):
     cache_key = "foobar"
     expected_path = Path("/foo/bar/01-raw_station_csv_gz/foobar.csv.gz")
 
-    mock = mocker.patch(
-        "metar_station.raw.io.get_data_dir",
-        return_value=Path("/foo/bar")
-    )
+    mocker.patch("metar_station.raw.io.get_data_dir", return_value=Path("/foo/bar"))
     logger = mocker.patch("logging.Logger.info")
     assert io.station_raw_csv_path(cache_key) == expected_path
     logger.assert_called_once_with(f"Generating csv cache path: {expected_path}")
 
 
 def test_station_raw_parquet_path(mocker):
-    cache_key = "foobar"
     expected_path = Path("/foo/bar/02-raw_station_pq/")
 
-    mock = mocker.patch(
-        "metar_station.raw.io.get_data_dir",
-        return_value=Path("/foo/bar")
-    )
+    mocker.patch("metar_station.raw.io.get_data_dir", return_value=Path("/foo/bar"))
     logger = mocker.patch("logging.Logger.info")
     assert io.station_raw_parquet_path() == expected_path
     logger.assert_called_once_with(f"Generating parquet root path: {expected_path}")
@@ -50,7 +43,7 @@ def test_write_station_raw_parquet(mocker, tmp_path):
     logger = mocker.patch("logging.Logger.info")
 
     rng = np.random.default_rng()
-    expected_df = pd.DataFrame(rng.integers(0, 100, size=(100, 4)), columns=list('ABCD'))
+    expected_df = pd.DataFrame(rng.integers(0, 100, size=(100, 4)), columns=list("ABCD"))
     expected_df["year"] = pd.Categorical([2020] * len(expected_df))
     expected_df["month"] = pd.Categorical([1] * len(expected_df))
     expected_df["station"] = pd.Categorical(["somestation"] * len(expected_df))

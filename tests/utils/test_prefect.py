@@ -1,5 +1,4 @@
 import pendulum
-import pytest
 
 from metar_station.utils import prefect
 

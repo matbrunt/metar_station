@@ -1,8 +1,6 @@
 import logging
 import gzip
 from pandas import DataFrame
-import pyarrow as pa 
-import pyarrow.parquet as pq
 from pathlib import Path
 
 from metar_station.utils.io import get_data_dir
@@ -18,7 +16,7 @@ def station_raw_csv_path(cache_key: str) -> Path:
 
 
 def write_station_raw_csv(filepath: Path, data: bytes) -> None:
-    filepath.parent.mkdir(parents=True, exist_ok=True)  #  create datastore if doesn't exist
+    filepath.parent.mkdir(parents=True, exist_ok=True)  # create datastore if doesn't exist
     logger.info(f"Saving compressed csv file: {filepath}")
     with gzip.open(filepath, "wb") as f:
         f.write(data)
@@ -31,6 +29,6 @@ def station_raw_parquet_path() -> Path:
 
 
 def write_station_raw_parquet(root_path: Path, df: DataFrame) -> None:
-    root_path.parent.mkdir(parents=True, exist_ok=True)  #  create datastore if doesn't exist
+    root_path.parent.mkdir(parents=True, exist_ok=True)  # create datastore if doesn't exist
     logger.info(f"Saving parquet dataset: {root_path}")
     df.to_parquet(root_path, engine="pyarrow", index=False, partition_cols=["year", "month", "station"])

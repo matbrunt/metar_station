@@ -1,5 +1,4 @@
 import pendulum
-import pytest
 
 from metar_station.raw import download
 
@@ -14,7 +13,7 @@ def test_query_populated():
 
 
 def test_build_station_raw_url():
-    query = download.StationPeriodQuery("EGPN", "2020-01") 
+    query = download.StationPeriodQuery("EGPN", "2020-01")
     url, _ = download.build_station_raw_url(query)
     assert url == "https://mesonet.agron.iastate.edu/cgi-bin/request/asos.py"
 

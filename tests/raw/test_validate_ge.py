@@ -1,20 +1,16 @@
-import pytest
-import pandas as pd
-from pandera import DataFrameSchema
-
 from metar_station.raw import validate_ge
 from metar_station.raw.download import StationPeriodQuery
 
 
 def test_build_validations():
-   query = StationPeriodQuery("EGPN", "2020-01") 
+    query = StationPeriodQuery("EGPN", "2020-01")
 
-   result = validate_ge._build_validations(query, "raw_station.warning")[0]
+    result = validate_ge._build_validations(query, "raw_station.warning")[0]
 
-   assert result["batch_request"]["data_connector_query"]["batch_filter_parameters"]["year"] == "2020"
-   assert result["batch_request"]["data_connector_query"]["batch_filter_parameters"]["month"] == "01"
-   assert result["batch_request"]["data_connector_query"]["batch_filter_parameters"]["station"] == "EGPN"
-   assert result["expectation_suite_name"] == "raw_station.warning"
+    assert result["batch_request"]["data_connector_query"]["batch_filter_parameters"]["year"] == "2020"
+    assert result["batch_request"]["data_connector_query"]["batch_filter_parameters"]["month"] == "01"
+    assert result["batch_request"]["data_connector_query"]["batch_filter_parameters"]["station"] == "EGPN"
+    assert result["expectation_suite_name"] == "raw_station.warning"
 
 
 def test_check_data(mocker):
@@ -27,8 +23,7 @@ def test_check_data(mocker):
     result = validate_ge._check_data(query, mock_context)
 
     mock_context.run_checkpoint.assert_called_once_with(
-        checkpoint_name="chk_raw_station",
-        validations=mock_validations.return_value
+        checkpoint_name="chk_raw_station", validations=mock_validations.return_value
     )
 
     mock_validations.assert_called_once_with(query, "raw_station.warning")
@@ -52,7 +47,7 @@ def test_validate_failed(mocker):
 
     logger.assert_called_once_with("EGPN failed validation for download")
 
-    assert result == False
+    assert result is False
 
 
 def test_validate_success(mocker):
@@ -71,4 +66,4 @@ def test_validate_success(mocker):
 
     assert not logger.called
 
-    assert result == True
+    assert result is True
