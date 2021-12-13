@@ -1,7 +1,5 @@
-import pytest
 import pandas as pd
 from pandera import DataFrameSchema, Column, Check
-from pandera.errors import SchemaErrors
 from pandas.testing import assert_frame_equal
 
 from metar_station.raw import validate_pandera
@@ -16,17 +14,21 @@ However I'm having issues throwing a mock SchemaErrors exception (normal excepti
 so because of time constraints I'll use concrete implementations for the moment and come back
 to revisit this once I have a base project implementation.
 """
+
+
 def test_validate_df_failed(mocker):
     df = pd.DataFrame({"colA": [1, 2, 3], "colB": ["a", "b", "c"]})
 
     logger_info = mocker.patch("logging.Logger.info")
     logger_warning = mocker.patch("logging.Logger.warning")
 
-    schema = DataFrameSchema({
-        "colA": Column(int, checks=[Check.in_range(2, 4)]),
-        "colB": Column(str, checks=[Check.isin(["a", "b", "c", "d"])]),
-        "colC": Column(str, checks=[Check.equal_to("a_constant_value")]),
-    })
+    schema = DataFrameSchema(
+        {
+            "colA": Column(int, checks=[Check.in_range(2, 4)]),
+            "colB": Column(str, checks=[Check.isin(["a", "b", "c", "d"])]),
+            "colC": Column(str, checks=[Check.equal_to("a_constant_value")]),
+        }
+    )
 
     result = validate_pandera.validate_df(df, schema)
 
@@ -34,10 +36,9 @@ def test_validate_df_failed(mocker):
 
     assert result is None
 
-    logger_warning.assert_has_calls([
-        mocker.call("Schema errors and failure cases:"),
-        mocker.call(mocker.ANY)
-    ], any_order=False)
+    logger_warning.assert_has_calls(
+        [mocker.call("Schema errors and failure cases:"), mocker.call(mocker.ANY)], any_order=False
+    )
 
 
 def test_validate_df_success(mocker):

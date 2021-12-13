@@ -2,7 +2,6 @@ import logging
 import great_expectations as ge
 from great_expectations.data_context.data_context import DataContext
 from great_expectations.checkpoint.types.checkpoint_result import CheckpointResult
-from pathlib import Path
 
 from metar_station.raw.download import StationPeriodQuery
 
@@ -23,11 +22,12 @@ def _build_validations(query: StationPeriodQuery, expectation_suite_name: str) -
                         "month": query.period_start.strftime("%m"),
                         "station": query.station,
                     }
-                }
+                },
             },
             "expectation_suite_name": expectation_suite_name,
         },
     ]
+
 
 def _check_data(query: StationPeriodQuery, context: DataContext) -> CheckpointResult:
     checkpoint_name = "chk_raw_station"

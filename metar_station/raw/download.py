@@ -1,9 +1,6 @@
-import datetime
 import logging
 import pendulum
-import requests
 from dataclasses import dataclass, field, InitVar
-from pathlib import Path
 from typing import Tuple, Dict, Union, Sequence
 
 
@@ -13,6 +10,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class StationPeriodQuery:
     """Query parameters for station monthly queries"""
+
     station: str
     period: InitVar[str]
     period_start: pendulum.DateTime = field(init=False)
